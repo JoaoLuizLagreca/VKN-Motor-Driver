@@ -88,7 +88,7 @@ int main() {
 			data = accept(listen_sock, NULL, NULL);
 			if (data == -1) {
 				perror("Error accepting data");
-				exit(EXIT_FAILURE);
+				continue;
 			}
 			
 			buffer = (byte*) malloc(bfs);
