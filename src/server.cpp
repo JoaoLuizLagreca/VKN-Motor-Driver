@@ -1,3 +1,7 @@
+/*
+ * TODO: Detecção de erro das rodas e sensor de movimentação por encoder
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
