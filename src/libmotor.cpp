@@ -25,8 +25,10 @@ using namespace std;
 namespace motor {
 	/* FIXME: Por razòes de segurança, as GPIOs não podem ser inicializadas no construtor */
 	driver::driver() {
-		speed_a = 255;
-		speed_b = 255;
+		w_speed[MOTOR_A] = 255;
+		w_speed[MOTOR_B] = 255;
+		w_mode[MOTOR_A] = WHEEL_MODE_IDLE;
+		w_mode[MOTOR_B] = WHEEL_MODE_IDLE;
 		
 		return;
 	}
@@ -95,90 +97,85 @@ namespace motor {
 	
 	/* TODO: Movimentos devem alternar pela velocidade das rodas e não diretamente */
 	
-	void driver::forward() {
-		printf("Moving forward\n");
-		/* FIXME: Montar recuperação de erro */
-		gpiod_line_set_value(mot1_in1, 1);
-		gpiod_line_set_value(mot1_in2, 0);
-		gpiod_line_set_value(mot2_in1, 1);
-		gpiod_line_set_value(mot2_in2, 0);
-	}
-		
-	void driver::backward() {
-		printf("Moving backward\n");
-		/* FIXME: Montar recuperação de erro */
-		gpiod_line_set_value(mot1_in1, 0);
-		gpiod_line_set_value(mot1_in2, 1);
-		gpiod_line_set_value(mot2_in1, 0);
-		gpiod_line_set_value(mot2_in2, 1);
-	}
-	
-	void driver::clockwise() {
-		printf("Turning clocwise\n");
-		/* FIXME: Montar recuperação de erro */
-		gpiod_line_set_value(mot1_in1, 1);
-		gpiod_line_set_value(mot1_in2, 0);
-		gpiod_line_set_value(mot2_in1, 0);
-		gpiod_line_set_value(mot2_in2, 1);
-	}
-	
-	void driver::counterclockwise(){
-		printf("Turning counterclockwise\n");
-		/* FIXME: Montar recuperação de erro */
-		gpiod_line_set_value(mot1_in1, 0);
-		gpiod_line_set_value(mot1_in2, 1);
-		gpiod_line_set_value(mot2_in1, 1);
-		gpiod_line_set_value(mot2_in2, 0);
-	}
-		
-	void driver::stop() {
-		printf("Breaking\n");
-		/* FIXME: Montar recuperação de erro */
-		gpiod_line_set_value(mot1_in1, 1);
-		gpiod_line_set_value(mot1_in2, 1);
-		gpiod_line_set_value(mot2_in1, 1);
-		gpiod_line_set_value(mot2_in2, 1);
-	}
-			
-	void driver::idle() {
-		printf("Becomming idle\n");
-		/* FIXME: Montar recuperação de erro */
-		gpiod_line_set_value(mot1_in1, 0);
-		gpiod_line_set_value(mot1_in2, 0);
-		gpiod_line_set_value(mot2_in1, 0);
-		gpiod_line_set_value(mot2_in2, 0);
-	}
-	
-	void driver::setSpeed(int motor_id, unsigned char speed) {
+	void driver::setWheelMode(int motor_id, int mode){
 		switch(motor_id) {
 			case MOTOR_A:
-				printf("Changing motor A speed to %d\n", speed);
-				speed_a = speed;
+				printf("Changing motor A mode to %d\n", mode);
+				switch (mode) {
+					case WHEEL_MODE_IDLE:
+						gpiod_line_set_value(mot1_in1, 0);
+						gpiod_line_set_value(mot1_in2, 0);
+					break;
+					case WHEEL_MODE_STOP:
+						gpiod_line_set_value(mot1_in1, 1);
+						gpiod_line_set_value(mot1_in2, 1);
+					break;
+					case WHEEL_MODE_FORW:
+						gpiod_line_set_value(mot1_in1, 1);
+						gpiod_line_set_value(mot1_in2, 0);
+					break;
+					case WHEEL_MODE_BACK:
+						gpiod_line_set_value(mot1_in1, 0);
+						gpiod_line_set_value(mot1_in2, 1);
+					break;
+					default:
+						throw std::runtime_error("Invalid mode");
+				}
 			break;
 			
 			case MOTOR_B:
-				printf("Changing motor B speed to %d\n", speed);
-				speed_b = speed;
+				printf("Changing motor B mode to %d\n", mode);
+				switch (mode) {
+					case WHEEL_MODE_IDLE:
+						gpiod_line_set_value(mot2_in1, 0);
+						gpiod_line_set_value(mot2_in2, 0);
+					break;
+					case WHEEL_MODE_STOP:
+						gpiod_line_set_value(mot2_in1, 1);
+						gpiod_line_set_value(mot2_in2, 1);
+					break;
+					case WHEEL_MODE_FORW:
+						gpiod_line_set_value(mot2_in1, 1);
+						gpiod_line_set_value(mot2_in2, 0);
+					break;
+					case WHEEL_MODE_BACK:
+						gpiod_line_set_value(mot2_in1, 0);
+						gpiod_line_set_value(mot2_in2, 1);
+					break;
+					default:
+						throw std::runtime_error("Invalid mode");
+				}
 			break;
 			
 			default:
-				throw std::runtime_error("Unindentified motor");
+				throw std::runtime_error("Invalid motor");
 		}
+		
+		w_mode[motor_id] = mode;
 	}
 	
-	unsigned char driver::getSpeed(int motor_id) {
-		switch(motor_id) {
-			case MOTOR_A:
-				return speed_a;
-			break;
-			
-			case MOTOR_B:
-				return speed_b;
-			break;
-			
-			default:
-				throw std::runtime_error("Unindentified motor");
+	unsigned char* driver::getWheelMode(int motor_id) {
+		if (motor_id > 1 || motor_id < 0) {
+			throw std::runtime_error("Invalid motor");
 		}
+		
+		return w_mode[motor_id];
+	}
+	
+	void driver::setWheelSpeed(int motor_id, unsigned char speed) {
+		if (motor_id > 1 || motor_id < 0) {
+			throw std::runtime_error("Invalid motor");
+		}
+		
+		w_speed[motor_id] = speed;
+	}
+	
+	unsigned char driver::getWheelSpeed(int motor_id) {
+		if (motor_id > 1 || motor_id < 0) {
+			throw std::runtime_error("Invalid motor");
+		}
+		
+		return w_speed[motor_id];
 	}
 	  
 }
