@@ -18,6 +18,10 @@ using namespace std;
 namespace motor {
 	/* FIXME: Por razòes de segurança, as GPIOs não podem ser inicializadas no construtor */
 	driver::driver() {
+		return;
+	}
+	
+	void driver::init() {
 		int ret1, ret2;
 		
 		chip_c = gpiod_chip_open_by_name(GPIO_C);
@@ -61,7 +65,6 @@ namespace motor {
 		end_setup:
 			return;
 	}
-	
 			
 	void driver::free() {
 		/* FIXME: Você não deve correr o risco de liberar ponteiros que não existem */
