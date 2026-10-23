@@ -76,6 +76,7 @@ namespace motor {
 	}
 	
 	void driver::forward() {
+		printf("Moving forward\n");
 		/* FIXME: Montar recuperação de erro */
 		gpiod_line_set_value(mot1_in1, 1);
 		gpiod_line_set_value(mot1_in2, 0);
@@ -84,6 +85,7 @@ namespace motor {
 	}
 		
 	void driver::backward() {
+		printf("Moving backward\n");
 		/* FIXME: Montar recuperação de erro */
 		gpiod_line_set_value(mot1_in1, 0);
 		gpiod_line_set_value(mot1_in2, 1);
@@ -92,6 +94,7 @@ namespace motor {
 	}
 		
 	void driver::stop() {
+		printf("Breaking\n");
 		/* FIXME: Montar recuperação de erro */
 		gpiod_line_set_value(mot1_in1, 1);
 		gpiod_line_set_value(mot1_in2, 1);
@@ -100,6 +103,7 @@ namespace motor {
 	}
 			
 	void driver::idle() {
+		printf("Becomming idle\n");
 		/* FIXME: Montar recuperação de erro */
 		gpiod_line_set_value(mot1_in1, 0);
 		gpiod_line_set_value(mot1_in2, 0);
