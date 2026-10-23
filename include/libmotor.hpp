@@ -11,9 +11,12 @@ namespace motor {
 		public:
 			driver();
 			
+			void init();
 			void free();
 			void forward();
 			void backward();
+			void clockwise();
+			void counterclockwise();
 			void stop();
 			void idle();
 		  
