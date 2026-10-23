@@ -12,7 +12,7 @@ driver:
 
 tools:
 	- mkdir -p ${OUTPUT} 2> /dev/null
-	${CC} src/tools/testemotor.cpp ${LIBS_TOOLS} -o ${OUTPUT}/teste
+	${CC} src/tools/testemotor.cpp -I include/ ${LIBS_TOOLS} -o ${OUTPUT}/teste
 
 clean:
 	rm -rf ${OUTPUT}
