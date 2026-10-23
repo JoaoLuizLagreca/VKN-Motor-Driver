@@ -11,13 +11,13 @@
 #include "libmotor.hpp"
 #include "servermacros.h"
 
-typedef char byte;
+typedef unsigned char byte;
 
 void closure();
 void treatData(byte *data);
 
 struct sockaddr_un addr;
-int listen_sock, data;
+int listen_sock, client;
 byte *buffer;
 motor::driver motor_drv;
 
@@ -72,8 +72,8 @@ int main() {
 	printf("Motor driver server started\n");
 	
 	while (true) {
-			data = accept(listen_sock, NULL, NULL);
-			if (data == -1) {
+			client = accept(listen_sock, NULL, NULL);
+			if (client == -1) {
 				perror("Error accepting data");
 				continue;
 			}
@@ -81,7 +81,7 @@ int main() {
 			buffer = (byte*) malloc(bfs);
 			while (true) {
 				memset(buffer, 0, bfs);
-				ret = recv(data, buffer, bfs, 0);
+				ret = recv(client, buffer, bfs, 0);
 				if (ret == -1){
 					perror("Error receiving data");
 					break;
@@ -94,7 +94,7 @@ int main() {
 			}
 			
 			free(buffer);
-			close(data);
+			close(client);
 	}
 	
 }
@@ -137,6 +137,21 @@ void treatData(byte *data){
 		
 		case FUNC_IDLE:
 			motor_drv.idle();
+		break;
+		
+		case FUNC_SETSPEED:
+			motor_drv.setSpeed(data[1], data[2]);
+		break;
+		
+		case FUNC_GETSPEED:
+			byte speed = motor_drv.getSpeed(data[1]);
+			char *buffer2 = (char *)malloc(sizeof(char));
+			buffer2[0] = speed;
+			int ret = send(client, buffer2, sizeof(char), MSG_EOR);
+			if (ret == -1) {
+				perror("GETSPEED Error responding client");
+			}
+			free(buffer2);
 		break;
 	}
 }
