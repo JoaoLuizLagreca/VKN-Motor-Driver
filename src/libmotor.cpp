@@ -92,6 +92,24 @@ namespace motor {
 		gpiod_line_set_value(mot2_in1, 0);
 		gpiod_line_set_value(mot2_in2, 1);
 	}
+	
+	void driver::clockwise() {
+		printf("Turning clocwise\n");
+		/* FIXME: Montar recuperação de erro */
+		gpiod_line_set_value(mot1_in1, 1);
+		gpiod_line_set_value(mot1_in2, 0);
+		gpiod_line_set_value(mot2_in1, 0);
+		gpiod_line_set_value(mot2_in2, 1);
+	}
+	
+	void driver::counterclockwise(){
+		printf("Turning counterclockwise\n");
+		/* FIXME: Montar recuperação de erro */
+		gpiod_line_set_value(mot1_in1, 0);
+		gpiod_line_set_value(mot1_in2, 1);
+		gpiod_line_set_value(mot2_in1, 1);
+		gpiod_line_set_value(mot2_in2, 0);
+	}
 		
 	void driver::stop() {
 		printf("Breaking\n");

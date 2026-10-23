@@ -130,6 +130,14 @@ void treatData(byte *data){
 		
 		case FUNC_BACKWARD:
 			motor_drv.backward();
+		break;
+		
+		case FUNC_CLKWISE:
+			motor_drv.clockwise();
+		break;
+		
+		case FUNC_CCKWISE:
+			motor_drv.counterclockwise();
 		break; 
 		
 		case FUNC_STOP:
