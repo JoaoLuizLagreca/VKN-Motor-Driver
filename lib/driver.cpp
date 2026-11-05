@@ -154,7 +154,7 @@ namespace motor {
 		w_mode[motor_id] = mode;
 	}
 	
-	unsigned char* driver::getWheelMode(int motor_id) {
+	unsigned char driver::getWheelMode(int motor_id) {
 		if (motor_id > 1 || motor_id < 0) {
 			throw std::runtime_error("Invalid motor");
 		}
