@@ -8,8 +8,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/stat.h>
-#include "driver.hpp"
-#include "servermacros.h"
+#include <driver.hpp>
+#include <servermacros.h>
 
 typedef unsigned char byte;
 
@@ -20,6 +20,7 @@ struct sockaddr_un addr;
 int listen_sock, client;
 byte *buffer;
 motor::driver motor_drv;
+byte drv_mode = DRIVER_MODE_BASIC;
 
 int main() {
 	int ret;
@@ -105,7 +106,8 @@ void closure() {
 	unlink(SOCKET_NAME);
 	
 	/* FIXME: Verificar se o driver foi iniciado */
-	motor_drv.idle();
+	motor_drv.setWheelMode(MOTOR_A, WHEEL_MODE_IDLE);
+	motor_drv.setWheelMode(MOTOR_B, WHEEL_MODE_IDLE);
 	motor_drv.free();
 	
 	return;
@@ -115,43 +117,26 @@ void treatData(byte *data){
 	printf("Received command %#04x\n", data[0]);
 	
 	switch(data[0]){
-		case FUNC_FORWARD:
-			motor_drv.forward();
-		break;
-		
-		case FUNC_BACKWARD:
-			motor_drv.backward();
-		break;
-		
-		case FUNC_CLKWISE:
-			motor_drv.clockwise();
-		break;
-		
-		case FUNC_CCKWISE:
-			motor_drv.counterclockwise();
-		break; 
-		
-		case FUNC_STOP:
-			motor_drv.stop();
-		break;
-		
-		case FUNC_IDLE:
-			motor_drv.idle();
-		break;
-		
-		case FUNC_SETSPEED:
-			motor_drv.setSpeed(data[1], data[2]);
-		break;
-		
-		case FUNC_GETSPEED:
-			byte speed = motor_drv.getSpeed(data[1]);
-			char *buffer2 = (char *)malloc(sizeof(char));
-			buffer2[0] = speed;
-			int ret = send(client, buffer2, sizeof(char), MSG_EOR);
-			if (ret == -1) {
-				perror("GETSPEED Error responding client");
+		case FUNC_SETMODE:
+			if(data[1] < 0x00 || data[1] > 0x01) {
+				perror("Invalid driver mode");
+				return;
 			}
-			free(buffer2);
+
+			drv_mode = data[1];
+			printf("Setting functin mode to %#04x\n", data[1]);
+		break;
+
+		case FUNC_GETMODE:
+			byte *r_buf = (byte *)malloc(sizeof(byte));
+			r_buf[0] = drv_mode;
+
+			int ret = send(client, r_buf, sizeof(char), MSG_EOR);
+			if (ret == -1) {
+				perror("GETMODE Error responding client");
+			}
+
+			free(r_buf);
 		break;
 	}
 }
