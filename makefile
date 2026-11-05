@@ -8,11 +8,11 @@ all: driver tools
 
 driver:
 	- mkdir -p ${OUTPUT} 2> /dev/null
-	${CC} src/*.cpp -I include/ ${LIBS_DRV} -o ${OUTPUT}/motor_driver
+	${CC} lib/*.cpp src/*.cpp -I lib/ ${LIBS_DRV} -o ${OUTPUT}/motor_driver
 
 tools:
 	- mkdir -p ${OUTPUT} 2> /dev/null
-	${CC} src/tools/testemotor.cpp -I include/ ${LIBS_TOOLS} -o ${OUTPUT}/teste
+	${CC} src/tools/testemotor.cpp -I lib/ ${LIBS_TOOLS} -o ${OUTPUT}/teste
 
 clean:
 	rm -rf ${OUTPUT}
