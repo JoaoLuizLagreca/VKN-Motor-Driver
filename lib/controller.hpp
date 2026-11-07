@@ -22,7 +22,7 @@ namespace motor {
             controller(motor::driver motor_drv);
             void setMovementMode(uint8_t mvt_mode);
             uint8_t getMovementMode();
-            void setAngle(int8_t angle_n);
+            void setAngle(int8_t angle);
             int8_t getAngle();
             void setSpeed(uint8_t speed);
             uint8_t getSpeed();

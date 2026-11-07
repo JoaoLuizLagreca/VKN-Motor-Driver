@@ -5,6 +5,8 @@
 #include "servermacros.h"
 #include <cmath>
 #include <numbers>
+#include <math.h>
+
 
 namespace motor {
     controller::controller(motor::driver motor_drv) {
@@ -17,7 +19,7 @@ namespace motor {
     }
 
     void controller::update_wheels(){
-        float drift = cos(angle * std::numbers::pi / 180);
+        float drift = cos(angle * M_PI / 180);
         uint8_t spa, spb;
         if(angle>0) {
             spb = speed * drift;
@@ -64,5 +66,36 @@ namespace motor {
                 motor_drv.setWheelSpeed(MOTOR_B, speed);
             break;
         }
+    }
+
+    void controller::setMovementMode(uint8_t mvt_mode) {
+        this->mvt_mode = mvt_mode; /* FIXME: Deve ser feito uma validação antes de aplicar o modo */
+        update();
+    }
+
+    uint8_t controller::getMovementMode() {
+        return mvt_mode;
+    }
+
+    void controller::setAngle(int8_t angle) {
+        if (angle > 90 || angle < -90) {
+            perror("Angle must be between -90° and 90°");
+            return;
+        }
+
+        this->angle = angle;
+        update();
+    }
+
+    int8_t controller::getAngle() {
+        return angle;
+    }
+
+    void controller::setSpeed(uint8_t speed) {
+        this->speed = speed;
+    }
+
+    uint8_t controller::getSpeed() {
+        return this->speed;
     }
 }
