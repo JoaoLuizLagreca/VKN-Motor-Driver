@@ -93,6 +93,7 @@ namespace motor {
 
     void controller::setSpeed(uint8_t speed) {
         this->speed = speed;
+        update();
     }
 
     uint8_t controller::getSpeed() {
