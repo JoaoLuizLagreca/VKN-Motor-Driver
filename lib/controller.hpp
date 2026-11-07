@@ -1,3 +1,5 @@
+#pragma once
+
 #include "driver.hpp"
 #include <stdint.h>
 

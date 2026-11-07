@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gpiod.h>
 
 #define MOTOR_A 0x00
